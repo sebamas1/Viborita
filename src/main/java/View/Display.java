@@ -1,4 +1,4 @@
-package View;
+package view;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -7,24 +7,36 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 
+import model.Vibora;
+
 @SuppressWarnings("serial")
-public class Display extends JFrame {
+public class Display extends JFrame implements Observer {
   private final int WIDTH = 500;
   private final int HEIGHT = 500;
-  private final int FLECHA_ARRIBA = KeyEvent.VK_UP;
-  private final int FLECHA_IZQUIERDA = KeyEvent.VK_LEFT;
-  private final int FLECHA_DERECHA = KeyEvent.VK_RIGHT;
-  private final int FLECHA_ABAJO = KeyEvent.VK_DOWN;
-
+  private final Dibujo arena;
+  private final Controler controler;
+  private final Vibora vibora;
+  private int posicion_x;
+  private int posicion_y;
   public Display() {
     setTitle("Viborita!");
     setSize(WIDTH, HEIGHT);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setResizable(false);
     setLocationRelativeTo(null);
-    add(new Dibujo());
+    vibora = new Vibora();
+    controler = new Controler(vibora);
+    vibora.attachObserver(this);
+    arena = new Dibujo();
+    add(arena);
     setVisible(true);
   }
+  public void update() {
+    posicion_x = vibora.getPosicionX();
+    posicion_y = vibora.getPosicionY();
+    arena.repaint();
+  }
+  
 
   private class Dibujo extends Canvas implements KeyListener {
     public Dibujo() {
@@ -34,30 +46,16 @@ public class Display extends JFrame {
     @Override
     public void paint(Graphics g) {
       g.setColor(new Color(255, 0, 0));
-      g.fillRect(100, 100, 10, 10);
+      g.fillRect(posicion_x, posicion_y, 10, 10);
     }
-
+    
     @Override
     public void keyTyped(KeyEvent e) {
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-      switch (e.getKeyCode()) {
-      case FLECHA_ARRIBA:
-        System.out.println("ARRIBA");
-        break;
-      case FLECHA_ABAJO:
-        System.out.println("ABAJO");
-        break;
-      case FLECHA_IZQUIERDA:
-        System.out.println("IZQUIERDA");
-        break;
-      case FLECHA_DERECHA:
-        System.out.println("DERECHA");
-        break;
-      default:
-      }
+    controler.notifyEvent(e);
 
     }
 
