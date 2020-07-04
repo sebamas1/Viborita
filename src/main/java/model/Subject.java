@@ -1,6 +1,6 @@
 package model;
 
-import view.Observer;
+import View.Observer;
 
 public interface Subject {
 public void attachObserver(Observer observer);

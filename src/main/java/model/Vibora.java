@@ -1,7 +1,7 @@
 package model;
 
 import java.util.HashSet;
-import view.Observer;
+import View.Observer;
 
 public class Vibora implements Subject, Runnable {
   public int posicion_x = 10;
