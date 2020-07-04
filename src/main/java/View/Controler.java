@@ -3,7 +3,11 @@ package view;
 import java.awt.event.KeyEvent;
 
 import model.Vibora;
-
+/**
+ * Parte del MVC implementado, recibe los KeyEvent del display, y sabe que significan para el model.
+ * @author Sebastian
+ *
+ */
 public class Controler {
   private final int FLECHA_ARRIBA = KeyEvent.VK_UP;
   private final int FLECHA_IZQUIERDA = KeyEvent.VK_LEFT;
@@ -14,23 +18,23 @@ public class Controler {
   public Controler(Vibora vibora) {
     this.vibora = vibora;
   }
+  /**
+   * 
+   * @param e evento del teclado.
+   */
   public void notifyEvent(KeyEvent e) {
     switch (e.getKeyCode()) {
     case FLECHA_ARRIBA:
-      vibora.posicion_y--;
-      vibora.notifyObservers();
+      vibora.setMovimiento(0);
       break;
     case FLECHA_ABAJO:
-      vibora.posicion_y++;
-      vibora.notifyObservers();
+      vibora.setMovimiento(1);
       break;
     case FLECHA_IZQUIERDA:
-      vibora.posicion_x--;
-      vibora.notifyObservers();
+      vibora.setMovimiento(2);
       break;
     case FLECHA_DERECHA:
-      vibora.posicion_x++;
-      vibora.notifyObservers();
+      vibora.setMovimiento(3);
       break;
     default:
     }
