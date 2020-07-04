@@ -1,6 +1,6 @@
 package main;
 
-import view.Display;
+import View.Display;
 
 public class Main {
 
