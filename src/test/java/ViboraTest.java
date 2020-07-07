@@ -15,8 +15,11 @@ class ViboraTest {
   @Test
   void test() {
     setMovimientoTest();
+    generarComidaTest();
   }
-  
+ /**
+  * Se fija que el movimiento que le metes al metodo, sea el que finalmente tiene la viborita.
+  */
   private void setMovimientoTest() {
     Vibora viborita = new Vibora();
     Class<?> refleccion = viborita.getClass();
@@ -66,6 +69,35 @@ class ViboraTest {
     } catch(NoSuchMethodException e) {
       e.printStackTrace();
     } catch(NoSuchFieldException | SecurityException e) {
+      e.printStackTrace();
+    }
+  }
+  /**
+   * Se fija que la comida que se genera, este siempre en una posicion tal que la viborita se pueda
+   * encasillar en esa posicion.
+   */
+  private void generarComidaTest() {
+    Vibora viborita = new Vibora();
+    Class<?> refleccion = viborita.getClass();
+    try {
+      for(int i = 0; i < 10000; i++) {
+        Method generarComida = refleccion.getDeclaredMethod("generarComida");
+        generarComida.setAccessible(true);
+        generarComida.invoke(viborita);
+        Field comida_posicion_x = refleccion.getDeclaredField("comida_posicion_x");
+        Field comida_posicion_y = refleccion.getDeclaredField("comida_posicion_y");
+        Field DESPLAZAMIENTO = refleccion.getDeclaredField("DESPLAZAMIENTO");
+        comida_posicion_x.setAccessible(true);
+        comida_posicion_y.setAccessible(true);
+        DESPLAZAMIENTO.setAccessible(true);
+        assertTrue((comida_posicion_x.getInt(viborita) % DESPLAZAMIENTO.getInt(viborita)) == 0);
+        assertTrue((comida_posicion_y.getInt(viborita) % DESPLAZAMIENTO.getInt(viborita)) == 0);
+      }
+    } catch (NoSuchMethodException | SecurityException e) {
+      e.printStackTrace();
+    } catch(IllegalAccessException | NoSuchFieldException e) {
+      e.printStackTrace();
+    } catch(IllegalArgumentException | InvocationTargetException e) {
       e.printStackTrace();
     }
   }

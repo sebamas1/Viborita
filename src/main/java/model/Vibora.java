@@ -138,10 +138,10 @@ public class Vibora implements Subject, Runnable {
   }
   private void generarComida() {
    do {
-     comida_posicion_x = (int) (Math.random() * (WIDTH)); //estos valores es para que no se salgan del margen
+     comida_posicion_x = (int) (Math.random() * (WIDTH));
    } while (!(comida_posicion_x % DESPLAZAMIENTO == 0));
    do {
-     comida_posicion_y = (int) (Math.random() * (HEIGHT));//hardodeadisimo, busca una solucion
+     comida_posicion_y = (int) (Math.random() * (HEIGHT));
    } while(!(comida_posicion_y % DESPLAZAMIENTO == 0));
   }
   private void comer() {
@@ -152,5 +152,8 @@ public class Vibora implements Subject, Runnable {
         generarComida();
       }while((comida_posicion_x == comida_posicion_anterior_x) || (comida_posicion_y == comida_posicion_anterior_y));
     }
+  }
+  private boolean posicionComidaValida() {
+    return false;
   }
 }
