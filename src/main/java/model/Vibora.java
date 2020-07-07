@@ -8,18 +8,15 @@ public class Vibora implements Subject, Runnable {
   private int vibora_posicion_y = 0;
   private int comida_posicion_x;
   private int comida_posicion_y;
+  private int comida_posicion_anterior_x;
+  private int comida_posicion_anterior_y;
   private int movimiento = 3;
   private boolean cambioMovimiento = false;
   private final HashSet<Observer> observers;
-  private final int VELOCIDAD = 10;
+  private final int DESPLAZAMIENTO = 10;
   private final int WIDTH = 500;
   private final int HEIGHT = 500;
   private final int SLEEP = 100;
-  /*
-   * por el momento, el tema de pasar la viborita por la comida queda bien, porque
-   * las dimensiones del cuadrado de la viborita coincide con la velocidad de desplazamiento
-   */
-  
   
   public Vibora() {
     observers = new HashSet<Observer>();
@@ -61,7 +58,8 @@ public class Vibora implements Subject, Runnable {
      switch(movimiento) {
      case 0:
        while(!getCambio()) {
-        vibora_posicion_y = (vibora_posicion_y - VELOCIDAD) < 0 ?  HEIGHT : vibora_posicion_y - VELOCIDAD;
+        vibora_posicion_y = (vibora_posicion_y - DESPLAZAMIENTO) < 0 ?  HEIGHT : vibora_posicion_y - DESPLAZAMIENTO;
+        comer();
         notifyObservers();
          try {
            Thread.sleep(SLEEP);
@@ -70,7 +68,8 @@ public class Vibora implements Subject, Runnable {
        break;
      case 1:
        while(!getCambio()) {
-         vibora_posicion_y = (vibora_posicion_y + VELOCIDAD) > HEIGHT ?  0 : vibora_posicion_y + VELOCIDAD;
+         vibora_posicion_y = (vibora_posicion_y + DESPLAZAMIENTO) > HEIGHT ?  0 : vibora_posicion_y + DESPLAZAMIENTO;
+         comer();
          notifyObservers();
          try {
            Thread.sleep(SLEEP);
@@ -79,7 +78,8 @@ public class Vibora implements Subject, Runnable {
        break;
      case 2:
        while(!getCambio()) {
-         vibora_posicion_x = (vibora_posicion_x - VELOCIDAD) < 0 ? WIDTH : vibora_posicion_x - VELOCIDAD;
+         vibora_posicion_x = (vibora_posicion_x - DESPLAZAMIENTO) < 0 ? WIDTH : vibora_posicion_x - DESPLAZAMIENTO;
+         comer();
          notifyObservers();
          try {
            Thread.sleep(SLEEP);
@@ -88,7 +88,8 @@ public class Vibora implements Subject, Runnable {
        break;
      case 3:
        while(!getCambio()) {
-         vibora_posicion_x = (vibora_posicion_x + VELOCIDAD) > WIDTH ?  0 : vibora_posicion_x + VELOCIDAD;
+         vibora_posicion_x = (vibora_posicion_x + DESPLAZAMIENTO) > WIDTH ?  0 : vibora_posicion_x + DESPLAZAMIENTO;
+         comer();
          notifyObservers();
          try {
            Thread.sleep(SLEEP);
@@ -132,13 +133,24 @@ public class Vibora implements Subject, Runnable {
   public int getPosicionComidaY() {
     return comida_posicion_y;
   }
-  //para que quede mas limpio, se van anecesitar posiciones multiplos de la velocidad
+  public int getDesplazamiento() {
+    return DESPLAZAMIENTO;
+  }
   private void generarComida() {
    do {
-     comida_posicion_x = (int) (Math.random() * (WIDTH-50)); //estos valores es para que no se salgan del margen
-   } while (!(comida_posicion_x % VELOCIDAD == 0));
+     comida_posicion_x = (int) (Math.random() * (WIDTH)); //estos valores es para que no se salgan del margen
+   } while (!(comida_posicion_x % DESPLAZAMIENTO == 0));
    do {
-     comida_posicion_y = (int) (Math.random() * (HEIGHT-50));//hardodeadisimo, busca una solucion
-   } while(!(comida_posicion_y % VELOCIDAD == 0));
+     comida_posicion_y = (int) (Math.random() * (HEIGHT));//hardodeadisimo, busca una solucion
+   } while(!(comida_posicion_y % DESPLAZAMIENTO == 0));
+  }
+  private void comer() {
+    if((vibora_posicion_x == comida_posicion_x) && (vibora_posicion_y == comida_posicion_y)) {
+      comida_posicion_anterior_x = comida_posicion_x;
+      comida_posicion_anterior_y = comida_posicion_y;
+      do {
+        generarComida();
+      }while((comida_posicion_x == comida_posicion_anterior_x) || (comida_posicion_y == comida_posicion_anterior_y));
+    }
   }
 }
