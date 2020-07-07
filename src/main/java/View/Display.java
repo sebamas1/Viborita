@@ -2,6 +2,7 @@ package View;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -15,23 +16,27 @@ import model.Vibora;
  */
 @SuppressWarnings("serial")
 public class Display extends JFrame implements Observer {
-  private final int WIDTH = 500;
-  private final int HEIGHT = 500;
+  private final int WIDTH;
+  private final int HEIGHT;
   private final Dibujo arena;
   private final Controler controler;
   private final Vibora vibora;
-  private int posicion_x;
-  private int posicion_y;
+  private int vibora_posicion_x;
+  private int vibora_posicion_y;
+  private int comida_posicion_x;
+  private int comida_posicion_y;
 
   public Display() {
+    vibora = new Vibora();
+    vibora.attachObserver(this);
+    WIDTH = vibora.getWidth();
+    HEIGHT= vibora.getHeight();
     setTitle("Viborita!");
     setSize(WIDTH, HEIGHT);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setResizable(false);
     setLocationRelativeTo(null);
-    vibora = new Vibora();
     controler = new Controler(vibora);
-    vibora.attachObserver(this);
     Thread t1 = new Thread(vibora, "Viborita");
     arena = new Dibujo();
     add(arena);
@@ -42,13 +47,15 @@ public class Display extends JFrame implements Observer {
    * Updatea el observer, es llamado por los subjects cada vez que hay nueva informacion relevante para este observer.
    */
   public void update() {
-    posicion_x = vibora.getPosicionX();
-    posicion_y = vibora.getPosicionY();
+    vibora_posicion_x = vibora.getPosicionX();
+    vibora_posicion_y = vibora.getPosicionY();
+    comida_posicion_x = vibora.getPosicionComidaX();
+    comida_posicion_y = vibora.getPosicionComidaY();
     arena.repaint();
   }
   /**
-   * esta clase se la crea para pasarsela al JFrame, la cual implementa KeyListener para poder escuchar las entradas
-   * del teclado del usuario
+   * Esta clase se la crea para pasarsela al JFrame, la cual implementa KeyListener para poder escuchar las entradas
+   * del teclado del usuario.
    * @author Sebastian
    *
    */
@@ -61,7 +68,8 @@ public class Display extends JFrame implements Observer {
     @Override
     public void paint(Graphics g) {
       g.setColor(new Color(255, 0, 0));
-      g.fillRect(posicion_x, posicion_y, 10, 10);
+      g.fillRect(vibora_posicion_x, vibora_posicion_y, 10, 10);
+      g.fillRect(comida_posicion_x, comida_posicion_y, 10, 10);
     }
 
     @Override

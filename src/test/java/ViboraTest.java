@@ -14,10 +14,10 @@ class ViboraTest {
    */
   @Test
   void test() {
-    reflect();
+    setMovimientoTest();
   }
   
-  private void reflect() {
+  private void setMovimientoTest() {
     Vibora viborita = new Vibora();
     Class<?> refleccion = viborita.getClass();
     Class[] parameterTypes = new Class[] {int.class}; //esta linea es super interesante, creas un array con los tipos de param a pasrle al getMethod
