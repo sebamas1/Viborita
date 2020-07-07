@@ -4,7 +4,6 @@ import java.util.HashSet;
 import View.Observer;
 
 public class Vibora implements Subject, Runnable {
-  //recordar actualizar valores de SLEEP y VELOCIDAD
   private int vibora_posicion_x = 0;
   private int vibora_posicion_y = 0;
   private int comida_posicion_x;
@@ -12,11 +11,16 @@ public class Vibora implements Subject, Runnable {
   private int movimiento = 3;
   private boolean cambioMovimiento = false;
   private final HashSet<Observer> observers;
-  private final int VELOCIDAD = 1;
+  private final int VELOCIDAD = 10;
   private final int WIDTH = 500;
   private final int HEIGHT = 500;
-  private final int SLEEP = 10;
-
+  private final int SLEEP = 100;
+  /*
+   * por el momento, el tema de pasar la viborita por la comida queda bien, porque
+   * las dimensiones del cuadrado de la viborita coincide con la velocidad de desplazamiento
+   */
+  
+  
   public Vibora() {
     observers = new HashSet<Observer>();
   }
@@ -130,9 +134,11 @@ public class Vibora implements Subject, Runnable {
   }
   //para que quede mas limpio, se van anecesitar posiciones multiplos de la velocidad
   private void generarComida() {
-   comida_posicion_x = (int) (Math.random() * (WIDTH-50));
-   comida_posicion_y = (int) (Math.random() * (HEIGHT-50));
-//   System.out.println(comida_posicion_x);
-//   System.out.println(comida_posicion_y);
+   do {
+     comida_posicion_x = (int) (Math.random() * (WIDTH-50)); //estos valores es para que no se salgan del margen
+   } while (!(comida_posicion_x % VELOCIDAD == 0));
+   do {
+     comida_posicion_y = (int) (Math.random() * (HEIGHT-50));//hardodeadisimo, busca una solucion
+   } while(!(comida_posicion_y % VELOCIDAD == 0));
   }
 }
