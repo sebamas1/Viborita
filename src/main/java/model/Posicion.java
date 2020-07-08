@@ -27,6 +27,9 @@ public class Posicion {
     this.nodo = aux;
     return aux;
   }
+  protected void cortar() {
+    nodo = null;
+  }
   protected void actualizarPosicion(int x, int y) {
     if(nodo == null) {
       viejaX = this.x;

@@ -21,6 +21,7 @@ public class Vibora implements Subject, Runnable {
   private final int HEIGHT = 500;
   private final int SLEEP = 100;
   private final ArrayList<Posicion> cuerpoVibora;
+  private boolean desplazamientoFlag = false;
 
   public Vibora() {
     viboraPosicionX = VIBORA_POSICION_INICIAL_X;
@@ -69,7 +70,9 @@ public class Vibora implements Subject, Runnable {
         while (!getCambio()) {
           int y = viboraPosicionY;
           viboraPosicionY = (viboraPosicionY - DESPLAZAMIENTO) < 0 ? HEIGHT : viboraPosicionY - DESPLAZAMIENTO;
+          desplazamientoFlag = true;
           comer(viboraPosicionX, y);
+          cortarCuerpo();
           desplazarCuerpo(viboraPosicionX, y);
           notifyObservers();
           try {
@@ -82,7 +85,9 @@ public class Vibora implements Subject, Runnable {
         while (!getCambio()) {
           int y = viboraPosicionY;
           viboraPosicionY = (viboraPosicionY + DESPLAZAMIENTO) > HEIGHT ? 0 : viboraPosicionY + DESPLAZAMIENTO;
+          desplazamientoFlag = true;
           comer(viboraPosicionX, y);
+          cortarCuerpo();
           desplazarCuerpo(viboraPosicionX, y);
           notifyObservers();
           try {
@@ -95,7 +100,9 @@ public class Vibora implements Subject, Runnable {
         while (!getCambio()) {
           int x = viboraPosicionX;
           viboraPosicionX = (viboraPosicionX - DESPLAZAMIENTO) < 0 ? WIDTH : viboraPosicionX - DESPLAZAMIENTO;
+          desplazamientoFlag = true;
           comer(x, viboraPosicionY);
+          cortarCuerpo();
           desplazarCuerpo(x, viboraPosicionY);
           notifyObservers();
           try {
@@ -108,7 +115,9 @@ public class Vibora implements Subject, Runnable {
         while (!getCambio()) {
           int x = viboraPosicionX;
           viboraPosicionX = (viboraPosicionX + DESPLAZAMIENTO) > WIDTH ? 0 : viboraPosicionX + DESPLAZAMIENTO;
+          desplazamientoFlag = true;
           comer(x, viboraPosicionY);
+          cortarCuerpo();
           desplazarCuerpo(x, viboraPosicionY);
           notifyObservers();
           try {
@@ -136,11 +145,12 @@ public class Vibora implements Subject, Runnable {
    * @param movimiento
    */
   public synchronized void setMovimiento(int movimiento) {
-    if (!(this.movimiento == movimiento)) {
+    if (!(this.movimiento == movimiento) && desplazamientoFlag) {
       if (!(this.movimiento == 0 && movimiento == 1) && !(this.movimiento == 1 && movimiento == 0)) {
         if (!(this.movimiento == 2 && movimiento == 3) && !(this.movimiento == 3 && movimiento == 2)) {
           this.movimiento = movimiento;
           cambioMovimiento = true;
+          desplazamientoFlag = false;
         } else
           return;
       } else
@@ -188,13 +198,19 @@ public class Vibora implements Subject, Runnable {
       crecer(x, y);
       do {
         generarComida();
-      } while (posicionComidaValida()); //hay que completar la funcion de validez
+      } while (!posicionComidaValida());
     }
   }
 
   private boolean posicionComidaValida() {
-    if ((comidaPosicionX == comidaPosicionAnteriorX) || (comidaPosicionY == comidaPosicionAnteriorY))
+    if ((comidaPosicionX == comidaPosicionAnteriorX) && (comidaPosicionY == comidaPosicionAnteriorY))
       return false;
+    for(int i = 0; i < cuerpoVibora.size(); i++) {
+      int x = cuerpoVibora.get(i).getX();
+      int y = cuerpoVibora.get(i).getY();
+      if((comidaPosicionX == x) && (comidaPosicionY == y))
+        return false;
+    }
     return true;
   }
   private void crecer(int x, int y) {
@@ -211,4 +227,21 @@ public class Vibora implements Subject, Runnable {
       cuerpoVibora.get(0).actualizarPosicion(nuevaX, nuevaY);
     }
   }
+  private void cortarCuerpo() {
+  for(int i = 0; i < cuerpoVibora.size(); i++) {
+    if((viboraPosicionX == cuerpoVibora.get(i).getX()) && (viboraPosicionY == cuerpoVibora.get(i).getY())) {
+      int aux = cuerpoVibora.size();
+      for(int j = i; j < aux; j++) {
+        cuerpoVibora.remove(i);
+      }
+      try {
+        cuerpoVibora.get(i - 1).cortar();
+      } catch(ArrayIndexOutOfBoundsException e) {
+        System.out.println("Si estas viendo esto, el usuario puede hacer vueltas de 180 gradossin desplazar la viborita");
+        e.printStackTrace();
+      }
+      return;
+    }
+  }
+}
 }
