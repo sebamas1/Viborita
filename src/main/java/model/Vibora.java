@@ -1,27 +1,41 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import View.Observer;
 
 public class Vibora implements Subject, Runnable {
-  public int posicion_x = 10;
-  public int posicion_y = 50;
-  private int velocidad_x = 1;
-  private int velocidad_y = 1;
-  private HashSet<Observer> observers;
-  private int movimiento = 0;
+  private int viboraPosicionX;
+  private int viboraPosicionY;
+  private int comidaPosicionX;
+  private int comidaPosicionY;
+  private int comidaPosicionAnteriorX;
+  private int comidaPosicionAnteriorY;
+  private int movimiento = 3;
   private boolean cambioMovimiento = false;
+  private final int VIBORA_POSICION_INICIAL_X = 0;
+  private final int VIBORA_POSICION_INICIAL_Y = 0;
+  private final HashSet<Observer> observers;
+  private final int DESPLAZAMIENTO = 10;
+  private final int WIDTH = 500;
+  private final int HEIGHT = 500;
+  private final int SLEEP = 100;
+  private final ArrayList<Posicion> cuerpoVibora;
+  private boolean desplazamientoFlag = false;
 
   public Vibora() {
+    viboraPosicionX = VIBORA_POSICION_INICIAL_X;
+    viboraPosicionY = VIBORA_POSICION_INICIAL_Y;
     observers = new HashSet<Observer>();
+    cuerpoVibora = new ArrayList<Posicion>();
   }
 
   public int getPosicionX() {
-    return posicion_x;
+    return viboraPosicionX;
   }
 
   public int getPosicionY() {
-    return posicion_y;
+    return viboraPosicionY;
   }
 
   @Override
@@ -41,73 +55,193 @@ public class Vibora implements Subject, Runnable {
     }
 
   }
-/**
- * Este metodo se corre como un thread separado: provoca que la viborita esta en constante movimiento hasta que un thread
- * cambia el movimiento de la viborita. En ese momento se actualiza el movimiento de la misma.
- */
+
+  /**
+   * Este metodo se corre como un thread separado: provoca que la viborita esta en
+   * constante movimiento hasta que un thread cambia el movimiento de la viborita.
+   * En ese momento se actualiza el movimiento de la misma.
+   */
   public void run() {
-   while(true) {
-     setCambioFalse();
-     switch(movimiento) {
-     case 0:
-       while(!getCambio()) {
-         posicion_y -= velocidad_y;
-         notifyObservers();
-         try {
-           Thread.sleep(10);
-         } catch(InterruptedException e) {}
-       }
-       break;
-     case 1:
-       while(!getCambio()) {
-         posicion_y += velocidad_y;
-         notifyObservers();
-         try {
-           Thread.sleep(10);
-         } catch(InterruptedException e) {}
-       }
-       break;
-     case 2:
-       while(!getCambio()) {
-         posicion_x -= velocidad_x;
-         notifyObservers();
-         try {
-           Thread.sleep(10);
-         } catch(InterruptedException e) {}
-       }
-       break;
-     case 3:
-       while(!getCambio()) {
-         posicion_x += velocidad_x;
-         notifyObservers();
-         try {
-           Thread.sleep(10);
-         } catch(InterruptedException e) {}
-       }
-       break;
-       default:
-     }
-   }
+    generarComida();
+    while (true) {
+      setCambioFalse();
+      switch (movimiento) {
+      case 0:
+        while (!getCambio()) {
+          int y = viboraPosicionY;
+          viboraPosicionY = (viboraPosicionY - DESPLAZAMIENTO) < 0 ? HEIGHT : viboraPosicionY - DESPLAZAMIENTO;
+          desplazamientoFlag = true;
+          comer(viboraPosicionX, y);
+          cortarCuerpo();
+          desplazarCuerpo(viboraPosicionX, y);
+          notifyObservers();
+          try {
+            Thread.sleep(SLEEP);
+          } catch (InterruptedException e) {
+          }
+        }
+        break;
+      case 1:
+        while (!getCambio()) {
+          int y = viboraPosicionY;
+          viboraPosicionY = (viboraPosicionY + DESPLAZAMIENTO) > HEIGHT ? 0 : viboraPosicionY + DESPLAZAMIENTO;
+          desplazamientoFlag = true;
+          comer(viboraPosicionX, y);
+          cortarCuerpo();
+          desplazarCuerpo(viboraPosicionX, y);
+          notifyObservers();
+          try {
+            Thread.sleep(SLEEP);
+          } catch (InterruptedException e) {
+          }
+        }
+        break;
+      case 2:
+        while (!getCambio()) {
+          int x = viboraPosicionX;
+          viboraPosicionX = (viboraPosicionX - DESPLAZAMIENTO) < 0 ? WIDTH : viboraPosicionX - DESPLAZAMIENTO;
+          desplazamientoFlag = true;
+          comer(x, viboraPosicionY);
+          cortarCuerpo();
+          desplazarCuerpo(x, viboraPosicionY);
+          notifyObservers();
+          try {
+            Thread.sleep(SLEEP);
+          } catch (InterruptedException e) {
+          }
+        }
+        break;
+      case 3:
+        while (!getCambio()) {
+          int x = viboraPosicionX;
+          viboraPosicionX = (viboraPosicionX + DESPLAZAMIENTO) > WIDTH ? 0 : viboraPosicionX + DESPLAZAMIENTO;
+          desplazamientoFlag = true;
+          comer(x, viboraPosicionY);
+          cortarCuerpo();
+          desplazarCuerpo(x, viboraPosicionY);
+          notifyObservers();
+          try {
+            Thread.sleep(SLEEP);
+          } catch (InterruptedException e) {
+          }
+        }
+        break;
+      default:
+      }
+    }
   }
-  
+
   private synchronized boolean getCambio() {
     return cambioMovimiento;
   }
+
   private synchronized void setCambioFalse() {
     cambioMovimiento = false;
   }
+
   /**
    * Setea el movimiento siempre y cuando el movimiento sea valido para el modelo.
+   * 
    * @param movimiento
    */
   public synchronized void setMovimiento(int movimiento) {
-    if(!(this.movimiento == movimiento)) {
-      if(!(this.movimiento == 0 && movimiento == 1) && !(this.movimiento == 1 && movimiento == 0)) {
-      if (!(this.movimiento == 2 && movimiento == 3) && !(this.movimiento == 3 && movimiento == 2)) {
-        this.movimiento = movimiento;
-        cambioMovimiento = true;
-      } else return;
-      } else return;
-    } else return;
+    if (!(this.movimiento == movimiento) && desplazamientoFlag) {
+      if (!(this.movimiento == 0 && movimiento == 1) && !(this.movimiento == 1 && movimiento == 0)) {
+        if (!(this.movimiento == 2 && movimiento == 3) && !(this.movimiento == 3 && movimiento == 2)) {
+          this.movimiento = movimiento;
+          cambioMovimiento = true;
+          desplazamientoFlag = false;
+        } else
+          return;
+      } else
+        return;
+    } else
+      return;
   }
+
+  public int getWidth() {
+    return WIDTH;
+  }
+
+  public int getHeight() {
+    return HEIGHT;
+  }
+
+  public int getPosicionComidaX() {
+    return comidaPosicionX;
+  }
+
+  public int getPosicionComidaY() {
+    return comidaPosicionY;
+  }
+
+  public int getDesplazamiento() {
+    return DESPLAZAMIENTO;
+  }
+  public ArrayList<Posicion> getCuerpoVibora() {
+    return cuerpoVibora;
+  }
+
+  private void generarComida() {
+    do {
+      comidaPosicionX = (int) (Math.random() * (WIDTH));
+    } while (!((comidaPosicionX - VIBORA_POSICION_INICIAL_X) % DESPLAZAMIENTO == 0));
+    do {
+      comidaPosicionY = (int) (Math.random() * (HEIGHT));
+    } while (!((comidaPosicionY - VIBORA_POSICION_INICIAL_Y) % DESPLAZAMIENTO == 0));
+  }
+
+  private void comer(int x, int y) {
+    if ((viboraPosicionX == comidaPosicionX) && (viboraPosicionY == comidaPosicionY)) {
+      comidaPosicionAnteriorX = comidaPosicionX;
+      comidaPosicionAnteriorY = comidaPosicionY;
+      crecer(x, y);
+      do {
+        generarComida();
+      } while (!posicionComidaValida());
+    }
+  }
+
+  private boolean posicionComidaValida() {
+    if ((comidaPosicionX == comidaPosicionAnteriorX) && (comidaPosicionY == comidaPosicionAnteriorY))
+      return false;
+    for(int i = 0; i < cuerpoVibora.size(); i++) {
+      int x = cuerpoVibora.get(i).getX();
+      int y = cuerpoVibora.get(i).getY();
+      if((comidaPosicionX == x) && (comidaPosicionY == y))
+        return false;
+    }
+    return true;
+  }
+  private void crecer(int x, int y) {
+    if (cuerpoVibora.size() == 0) {
+      cuerpoVibora.add(new Posicion(x, y));
+    } else {
+      cuerpoVibora.add(cuerpoVibora.get(cuerpoVibora.size() - 1).setSiguienteNodo());
+    }
+  }
+  private void desplazarCuerpo(int nuevaX, int nuevaY) {
+    if (cuerpoVibora.size() == 0) {
+      return;
+    } else {
+      cuerpoVibora.get(0).actualizarPosicion(nuevaX, nuevaY);
+    }
+  }
+  private void cortarCuerpo() {
+  for(int i = 0; i < cuerpoVibora.size(); i++) {
+    if((viboraPosicionX == cuerpoVibora.get(i).getX()) && (viboraPosicionY == cuerpoVibora.get(i).getY())) {
+      int aux = cuerpoVibora.size();
+      for(int j = i; j < aux; j++) {
+        cuerpoVibora.remove(i);
+      }
+      try {
+        cuerpoVibora.get(i - 1).cortar();
+      } catch(ArrayIndexOutOfBoundsException e) {
+        System.out.println("Si estas viendo esto, el usuario puede hacer vueltas de 180 gradossin desplazar la viborita");
+        e.printStackTrace();
+      }
+      return;
+    }
+  }
+}
 }
