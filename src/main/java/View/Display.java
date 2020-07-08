@@ -4,10 +4,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import model.Posicion;
 import model.Vibora;
 
 /**
@@ -26,6 +29,7 @@ public class Display extends JFrame implements Observer {
   private final Dibujo arena;
   private final Controler controler;
   private final Vibora vibora;
+  private ArrayList<Posicion> cuerpoVibora;
   private int vibora_posicion_x;
   private int vibora_posicion_y;
   private int comida_posicion_x;
@@ -38,6 +42,7 @@ public class Display extends JFrame implements Observer {
     WIDTH = vibora.getWidth();
     HEIGHT = vibora.getHeight();
     DIMENSION = vibora.getDesplazamiento();
+    cuerpoVibora = vibora.getCuerpoVibora();
     setTitle("Viborita!");
     setSize(WIDTH + MARGEN_WIDTH, HEIGHT + MARGEN_HEIGHT); //estaria bueno poder borrar estos margenes, pero eso es un problema para el futuro
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -83,6 +88,9 @@ public class Display extends JFrame implements Observer {
       g.setColor(new Color(255, 0, 0));
       g.fillRect(vibora_posicion_x, vibora_posicion_y, DIMENSION, DIMENSION);
       g.fillRect(comida_posicion_x, comida_posicion_y, DIMENSION, DIMENSION);
+      for(int i = 0; i < cuerpoVibora.size(); i++) {
+        g.fillRect(cuerpoVibora.get(i).getX(), cuerpoVibora.get(i).getY(), DIMENSION, DIMENSION);
+      }
     }
 
     @Override
