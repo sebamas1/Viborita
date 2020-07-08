@@ -33,35 +33,51 @@ class ViboraTest {
       Method metodo = refleccion.getMethod("setMovimiento", parameterTypes);
       metodo.setAccessible(true);
       Field campo = refleccion.getDeclaredField("movimiento");
+      Field flag = refleccion.getDeclaredField("desplazamientoFlag");
+      flag.setAccessible(true);
+      flag.set(viborita, true);
       campo.setAccessible(true);
       metodo.invoke(viborita, 0);
       assertEquals(campo.get(viborita), Integer.valueOf(0));
+      flag.set(viborita, true);
       metodo.invoke(viborita, 2);
       assertEquals(campo.get(viborita), Integer.valueOf(2));
+      flag.set(viborita, true);
       metodo.invoke(viborita, 1);
       assertEquals(campo.get(viborita), Integer.valueOf(1));
+      flag.set(viborita, true);
       metodo.invoke(viborita, 3);
       assertEquals(campo.get(viborita), Integer.valueOf(3));
 
       // esto siguiente es porque si estoy en 0,(arriba) no puedo ir hacia 1(abajo)
+      flag.set(viborita, true);
       metodo.invoke(viborita, 0);
+      flag.set(viborita, true);
       metodo.invoke(viborita, 1);
       assertFalse(campo.get(viborita).equals(Integer.valueOf(1)));
       assertEquals(campo.get(viborita), Integer.valueOf(0));
 
+      flag.set(viborita, true);
       metodo.invoke(viborita, 3);
+      flag.set(viborita, true);
       metodo.invoke(viborita, 1);
+      flag.set(viborita, true);
       metodo.invoke(viborita, 0);
       assertFalse(campo.get(viborita).equals(Integer.valueOf(0)));
       assertEquals(campo.get(viborita), Integer.valueOf(1));
 
+      flag.set(viborita, true);
       metodo.invoke(viborita, 2);
+      flag.set(viborita, true);
       metodo.invoke(viborita, 3);
       assertFalse(campo.get(viborita).equals(Integer.valueOf(3)));
       assertEquals(campo.get(viborita), Integer.valueOf(2));
 
+      flag.set(viborita, true);
       metodo.invoke(viborita, 1);
+      flag.set(viborita, true);
       metodo.invoke(viborita, 3);
+      flag.set(viborita, true);
       metodo.invoke(viborita, 2);
       assertFalse(campo.get(viborita).equals(Integer.valueOf(2)));
       assertEquals(campo.get(viborita), Integer.valueOf(3));
